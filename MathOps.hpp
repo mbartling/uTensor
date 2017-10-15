@@ -74,20 +74,30 @@ void Min(Tensor<TIn> input, Tensor<Td> dim, Tensor<TOut> out) {
   const Td *p_in2 = dim.getPointer({});
   TOut *p_out = out.getPointer({});
 
-  const uint32_t size = dim.getSize();
   vector<uint32_t> shape = input.getShape();
-  TOut min = INT_MAX;
-  for (uint32_t i = 0; i < size; i++) {
-    Td n_dim = p_in2[i];
-    uint32_t num = shape[n_dim];
-    uint32_t stride = input.getStride(n_dim);
-    for (uint32_t j = stride; j < stride + num; j++) {
-        if (p_in[j] < min) {
-            min = p_in[j];
+  const uint32_t dims = shape.size();
+  const uint32_t size_axis = dim.getSize();
+  TOut min = std::numeric_limits<TOut>::max();
+  for (uint32_t r = 0; r < size_axis; r++) { 
+    Td reduced_dim = p_in2[r];
+    for (uint32_t i = 0; i < dims; i++) {
+      Td current_dim = p_in2[i];
+      if (current_dim == reduced_dim) {
+         continue;
+      }
+      for (uint32_t h = 0; h < shape[current_dim]; h++) {
+        uint32_t stride = input.getStride(current_dim);
+        uint32_t offset = h * stride; 
+        for (uint32_t k = 0; k < shape[reduced_dim]; k++) {
+          TOut val = p_in[k * input.getStride(reduced_dim) + offset];
+          if (val < min) {
+            min = val;
+          }
         }
+      }
+      p_out[i] = min;
+      min = std::numeric_limits<TOut>::max();   
     }
-    p_out[i] = min;
-    min = INT_MAX;   
   }
 }
 template<class TIn, class Td, class TOut>
