@@ -223,10 +223,10 @@ class MathOpsTest : public Test {
   }
 
   void runAll(void) {
-    argmaxTest();
-    argmaxTest2();
     requantization_rangeTest();
     requantizeTest();
+    argmaxTest();
+    argmaxTest2();
     addTest();
     minTest();
     maxTest();

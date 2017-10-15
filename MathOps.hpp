@@ -77,11 +77,11 @@ void Min(Tensor<TIn> input, Tensor<Td> dim, Tensor<TOut> out) {
   vector<uint32_t> shape = input.getShape();
   const uint32_t dims = shape.size();
   const uint32_t size_axis = dim.getSize();
-  TOut min = std::numeric_limits<TOut>::max();
   for (uint32_t r = 0; r < size_axis; r++) { 
+    TOut min = std::numeric_limits<TOut>::max();
     Td reduced_dim = p_in2[r];
     for (uint32_t i = 0; i < dims; i++) {
-      Td current_dim = p_in2[i];
+      Td current_dim = i;
       if (current_dim == reduced_dim) {
          continue;
       }
@@ -96,7 +96,6 @@ void Min(Tensor<TIn> input, Tensor<Td> dim, Tensor<TOut> out) {
         }
       }
       p_out[i] = min;
-      min = std::numeric_limits<TOut>::max();   
     }
   }
 }
